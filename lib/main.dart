@@ -5,9 +5,12 @@ import 'package:chatbotapp/providers/settings_provider.dart';
 import 'package:chatbotapp/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await dotenv.load(fileName: ".env");
   await ChatProvider.initHive();
 
   runApp(MultiProvider(

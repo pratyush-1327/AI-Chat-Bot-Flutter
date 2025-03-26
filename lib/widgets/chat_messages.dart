@@ -4,14 +4,25 @@ import 'package:chatbotapp/providers/chat_provider.dart';
 import 'package:chatbotapp/widgets/assistant_message_widget.dart';
 import 'package:chatbotapp/widgets/my_message_widget.dart';
 
+/// A widget that displays a conversation between the user and the assistant.
+///
+/// This widget renders a list of chat messages, differentiating between
+/// user messages and assistant messages with appropriate styling.
 class ChatMessages extends StatelessWidget {
+  /// Creates a chat messages widget.
+  ///
+  /// The [scrollController] controls the scrolling of the chat list.
+  /// The [chatProvider] provides the messages to be displayed.
   const ChatMessages({
     super.key,
     required this.scrollController,
     required this.chatProvider,
   });
 
+  /// Controls scrolling behavior of the chat messages list.
   final ScrollController scrollController;
+
+  /// Provides access to the chat messages and related functionality.
   final ChatProvider chatProvider;
 
   @override
@@ -20,11 +31,10 @@ class ChatMessages extends StatelessWidget {
       controller: scrollController,
       itemCount: chatProvider.inChatMessages.length,
       itemBuilder: (context, index) {
-        // compare with timeSent before showing the list
         final message = chatProvider.inChatMessages[index];
-        return message.role.name == Role.user.name
+        return message.role == Role.user
             ? MyMessageWidget(message: message)
-            : AssistantMessageWidget(message: message.message.toString());
+            : AssistantMessageWidget(message: message);
       },
     );
   }

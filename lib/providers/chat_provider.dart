@@ -24,26 +24,46 @@ class ChatProvider extends ChangeNotifier {
   /// Indicator for loading state.
   bool _isLoading = false;
 
-  // Private fields for managing chat state
-  late List<XFile>? _imagesFileList;
-  late int _currentIndex;
-  late String _currentChatId;
-  late GenerativeModel? _model;
-  late GenerativeModel? _textModel;
-  late GenerativeModel? _visionModel;
-  late String _modelType;
-  late PageController _pageController;
+  /// Model type
+  static const String _modelType = 'gemini-2.0-flash';
+
+  // Chat state
+  String _currentChatId = '';
+
+  // Image state
+  List<XFile>? _imagesFileList = [];
+  int _currentIndex = 0;
+
+  // Model instances
+  late final GenerativeModel _model;
+  late final GenerativeModel _textModel;
+  late final GenerativeModel _visionModel;
+
+  // Page Controller
+  final PageController _pageController = PageController();
+
+  ChatProvider() {
+    _textModel = GenerativeModel(
+      model: _modelType,
+      apiKey: ApiService.apiKey,
+    );
+    _visionModel = GenerativeModel(
+      model: 'gemini-2.0-flash-vision',
+      apiKey: ApiService.apiKey,
+    );
+  }
+
   // Getters
   List<Message> get inChatMessages => List.unmodifiable(_inChatMessages);
-  PageController get pageController => _pageController;
+  bool get isLoading => _isLoading;
+  String get currentChatId => _currentChatId;
   List<XFile>? get imagesFileList => _imagesFileList;
   int get currentIndex => _currentIndex;
-  String get currentChatId => _currentChatId;
   GenerativeModel? get model => _model;
   GenerativeModel? get textModel => _textModel;
   GenerativeModel? get visionModel => _visionModel;
   String get modelType => _modelType;
-  bool get isLoading => _isLoading;
+  PageController get pageController => _pageController;
 
   /// Sets in-chat messages based on the provided chat ID.
   Future<void> setInChatMessages({required String chatId}) async {
@@ -70,41 +90,26 @@ class ChatProvider extends ChangeNotifier {
   /// Sets the list of image files for the chat.
   void setImagesFileList({required List<XFile> listValue}) {
     _imagesFileList = listValue;
-    notifyListeners();
-  }
-
-  /// Sets the current model type.
-  String setCurrentModel({required String newModel}) {
-    _modelType = newModel;
-    notifyListeners();
-    return newModel;
-  }
-
-  /// Configures the model based on whether the chat is text-only.
-  Future<void> setModel({required bool isTextOnly}) async {
-    _model = (isTextOnly ? _textModel : _visionModel) ??
-        GenerativeModel(
-          model: setCurrentModel(newModel: 'gemini-2.0-flash'),
-          apiKey: ApiService.apiKey,
-        );
-    notifyListeners();
   }
 
   /// Sets the current page index.
   void setCurrentIndex({required int newIndex}) {
     _currentIndex = newIndex;
-    notifyListeners();
   }
 
   /// Sets the current chat ID.
   void setCurrentChatId({required String newChatId}) {
     _currentChatId = newChatId;
-    notifyListeners();
   }
 
   /// Sets the loading state.
   void setLoading({required bool value}) {
     _isLoading = value;
+  }
+
+  /// Configures the model based on whether the chat is text-only.
+  Future<void> setModel({required bool isTextOnly}) async {
+    _model = isTextOnly ? _textModel : _visionModel;
     notifyListeners();
   }
 
@@ -141,7 +146,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   /// Sends a message and manages the response from the assistant.
-  Future<void> sendMessage({
+  Future<void> sentMessage({
     required String message,
     required bool isTextOnly,
   }) async {
@@ -191,7 +196,7 @@ class ChatProvider extends ChangeNotifier {
     required String modelMessageId,
     required Box messagesBox,
   }) async {
-    final chatSession = _model!.startChat(
+    final chatSession = _model.startChat(
       history: history.isEmpty || !isTextOnly ? null : history,
     );
 
@@ -290,8 +295,6 @@ class ChatProvider extends ChangeNotifier {
   /// Retrieves the chat history.
   Future<List<Content>> getHistory({required String chatId}) async {
     if (_currentChatId.isEmpty) return [];
-
-    await setInChatMessages(chatId: chatId);
 
     return _inChatMessages.map((message) {
       return message.role == Role.user
