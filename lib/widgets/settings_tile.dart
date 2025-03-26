@@ -17,10 +17,11 @@ class SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: ListTile(
         leading: Container(
             decoration: BoxDecoration(
-              color: Colors.deepPurple,
+              color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Padding(

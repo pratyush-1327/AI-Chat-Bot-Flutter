@@ -18,20 +18,23 @@ class BuildDisplayImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        CircleAvatar(
-          radius: 60.0,
-          backgroundColor: Colors.grey[200],
-          backgroundImage: getImageToShow(),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(60.0),
+          child: CircleAvatar(
+            radius: 60.0,
+            backgroundColor: Colors.grey[200],
+            backgroundImage: getImageToShow(),
+          ),
         ),
         Positioned(
           bottom: 0.0,
           right: 0.0,
           child: InkWell(
             onTap: onPressed,
-            child: const CircleAvatar(
-              backgroundColor: Colors.blue,
+            child: CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
               radius: 20.0,
-              child: Icon(
+              child: const Icon(
                 Icons.camera_alt,
                 color: Colors.white,
               ),
